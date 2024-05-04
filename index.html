@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Guides</title>
+    <title>Pink List</title>
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
     <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet">
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
@@ -11,11 +11,8 @@
 
     <style>
         :root {
-
             --blurriness: 20px;
-
             --pinklist-pink: #F462BC;
-
             --secondary-10: #F2EDEF;
             --secondary-90: #8F626D;
         }
@@ -36,6 +33,38 @@
             margin: 0;
             padding: 0;
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+        }
+
+        .fadeInUp{
+            animation: fadeInUp .3s;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fadeInDown{
+            animation: fadeInDown .3s;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .card-logo {
@@ -66,7 +95,7 @@
             background-color: rgba(255, 255, 255, 1);
             box-shadow: rgba(255, 255, 255, 1) 0px 0px var(--blurriness) var(--blurriness);
             border-radius: 5px;
-            margin: 20px;
+            margin: 40px;
         }
 
         #popup {
@@ -152,31 +181,122 @@
         .text-11 {
             font-size: 11px;
         }
+
+        @media (max-width: 768px) {
+
+
+            .size36 {
+                width: 36px;
+                border-radius: 36px;
+                transform: rotate(360deg);
+            }
+
+            .rotate{
+                transition: .3s;
+                transform: rotate(180deg);
+            }
+
+            .size36:hover{
+                background-color: var(--secondary-10);
+            }
+
+            body {
+                font-size: 14px;
+            }
+
+            #info-card {
+                width: calc(100vw - 64px);
+                padding: 0 20px 12px 20px;
+                display: block;
+                margin: 0 20px 20px 20px;
+                border-radius: 0 0 8px 8px;
+            }
+
+            #popup {
+                top: auto !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                margin: 0;
+                border-radius: 8px 8px 0 0;
+            }
+
+            #search-bar {
+                width: 68vw;
+                display: flex;
+                margin: 16px -4px;
+                font-size: 14px;
+                padding: 16px 24px;
+            }
+
+            .flexrow {
+                gap: 20px;
+                align-items: center;
+            }
+
+            .flexcol {}
+
+            .icon {
+                height: 48px;
+                width: 48px;
+            }
+
+            .card-party,
+            .card-place {
+                font-size: 12px;
+            }
+
+            .text-11 {
+                display: none;
+            }
+        }
     </style>
 </head>
 
 <body>
     <div id="popup"></div>
     <div id="info-card">
-        <img class="card-logo" src="logo.png" alt="">
-        <h2>Pink Sabha</h2>
-        <div>Know where your elected MP<br> stands on <span class="pinktext">LGBTQ+ Issues</span></div>
-        <input type="text" id="search-bar" placeholder="Search...">
-        <div>Filter by</div>
-        <div class="flexrow">
-            <div class="flexcol">
-                <img class="icon" id="vocal-img" src="vocal.png" alt="">
-                <div>Vocal</div>
-            </div>
-            <div class="flexcol">
-                <img class="icon" id="silent-img" src="silent.png" alt="">
-                <div>Silent</div>
+        <div class="flexrow spacebetween">
+            <img class="card-logo" src="logo.png" alt="">
+            <img id="header-status" class="size36" src="cross.svg" onclick="toggleHeaderMenu()" alt="">
+        </div>
+
+        <div id="header-collapsible" class="fadeInDown">
+            <h2>Pink Sabha</h2>
+            <div>Know where your elected MP<br> stands on <span class="pinktext">LGBTQ+ Issues</span></div>
+            <input type="text" id="search-bar" placeholder="Search...">
+            <div>Filter by</div>
+            <div class="flexrow">
+                <div class="flexcol">
+                    <img class="icon" id="vocal-img" src="vocal.png" alt="">
+                    <div>Vocal</div>
+                </div>
+                <div class="flexcol">
+                    <img class="icon" id="silent-img" src="silent.png" alt="">
+                    <div>Silent</div>
+                </div>
             </div>
         </div>
+        
     </div>
 
     <div id="map"></div>
     <script>
+
+        function toggleHeaderMenu() {
+
+            var headerStatus = document.getElementById('header-status');
+
+            headerStatus.classList.toggle('rotate');
+            var infoCard = document.getElementById('header-collapsible');
+            if (infoCard.style.display === 'none') {
+                infoCard.style.display = 'block';
+                headerStatus.src = 'cross.svg';
+            } else {
+                infoCard.style.display = 'none';
+                headerStatus.src = 'menu.svg';
+            }
+        }
 
         mapboxgl.accessToken = 'pk.eyJ1IjoiZ3lhbmwiLCJhIjoiY2swNmNoY29kMDA2ZzNjbWN4MmRvbHlmYiJ9.HJHfadzLE1cNqce2G51BEQ';
 
@@ -266,22 +386,22 @@
 
                                 <div class="flexcol">Overall
                                     <img class="icon" id="vocal-img" src="vocal.png" alt="">
-                                    <br>${data["LGBTQIA+ Rights"]}
+                                    ${data["LGBTQIA+ Rights"]}
                                 </div>
 
                                 <div class="flexcol">Queer Rights
                                     <img class="icon" id="vocal-img" src="vocal.png" alt="">
-                                    <br>${data["LGBTQIA+ Rights"]}
+                                    ${data["LGBTQIA+ Rights"]}
                                 </div>
 
                                 <div class="flexcol">Trans Rights
                                     <img class="icon" id="vocal-img" src="vocal.png" alt="">
-                                    <br>${data["Trans Rights"]}
+                                    ${data["Trans Rights"]}
                                 </div>
 
                                 <div class="flexcol">Queerphobia
                                     <img class="icon" id="vocal-img" src="vocal.png" alt="">
-                                    <br>${data["Homophobe"]}
+                                    ${data["Homophobe"]}
                                 </div>
 
                             </div>
