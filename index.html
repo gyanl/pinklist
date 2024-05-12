@@ -301,6 +301,7 @@
 
         .mapboxgl-popup-content {
             padding: 12px 16px;
+            border-top: 10px solid var(--pinklist-pink);
         }
 
         .pc_name {
@@ -461,7 +462,8 @@
         );
 
         map.on('load', () => {
-            fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vRI9K2oTcGJvJi542f8-CU3BIe_TN3ZMlGqEdmy1VBYn9KBo5dYFgMmEAK9D_QCQawmnahT9TZbC0ln/pub?output=csv').then(resp => resp.text()).then(response => {
+
+            fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vSbtd1qW9o9HNYoKqzGxf6xbG5yjpEIuX3YxFKjTW13SNWPb4Jw6MLX4tXwSwTKwc3H6QDCXLi1kXZZ/pub?gid=913888551&single=true&output=csv').then(resp => resp.text()).then(response => {
                 csv().fromString(response).then(result => {
                     console.log(result)
                     fetchedData = result
@@ -469,8 +471,8 @@
                     // Yes hex #ff33cc
                     // No hex #fec8ea
 
-                    const yes_results = result.filter(row => row.QueerStatement === "1")
-                    const no_results = result.filter(row => row.QueerStatement === "0")
+                    const yes_results = result.filter(row => row.Stance === "Vocal")
+                    const no_results = result.filter(row => row.Stance === "0")
                     const yes_ids = yes_results.map(row => parseInt(row.pc_id));
                     const no_ids = no_results.map(row => parseInt(row.pc_id));
 
@@ -555,22 +557,22 @@
 
                                 <div class="flexcol">Overall
                                     <img class="icon" id="vocal-img" src="vocal.png" alt="">
-                                    ${properties["LGBTQIA+ Rights"]}
+                                    ${properties["Stance"]}
                                 </div>
 
                                 <div class="flexcol">Queer Rights
                                     <img class="icon" id="vocal-img" src="vocal.png" alt="">
-                                    ${properties["LGBTQIA+ Rights"]}
+                                    ${properties["QueerRights"]}
                                 </div>
 
                                 <div class="flexcol">Trans Rights
                                     <img class="icon" id="vocal-img" src="vocal.png" alt="">
-                                    ${properties["Trans Rights"]}
+                                    ${properties["TransRights"]}
                                 </div>
 
                                 <div class="flexcol">Queerphobia
                                     <img class="icon" id="vocal-img" src="vocal.png" alt="">
-                                    ${properties["Homophobe"]}
+                                    ${properties["Queerphobia"]}
                                 </div>
 
                             </div>
