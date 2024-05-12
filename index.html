@@ -3,444 +3,276 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Pink List</title>
+    <title>Pinklist Map</title>
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
-    <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet">
-    <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@600&display=swap" rel="stylesheet">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.13.0/mapbox-gl.css" rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css"
+        type="text/css">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.13.0/mapbox-gl.js"></script>
+    <script
+        src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+    <script src="https://cdn.rawgit.com/Keyang/node-csvtojson/d41f44aa/browser/csvtojson.min.js"></script>
+    <script src='https://unpkg.com/@turf/turf@6/turf.min.js'></script>
 
     <style>
-        :root {
-            --blurriness: 20px;
-            --pinklist-pink: #F462BC;
-            --secondary-10: #F2EDEF;
-            --secondary-90: #8F626D;
-        }
-
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        h6 {
-            font-family: Epilogue, sans-serif;
-            font-weight: 600;
-            margin: 4px 0;
-        }
-
         body {
-            line-height: 1.4;
             margin: 0;
             padding: 0;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-        }
-
-        .fadeInUp{
-            animation: fadeInUp .3s;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .fadeInDown{
-            animation: fadeInDown .3s;
-        }
-
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .card-logo {
-            height: 32px;
-            margin-bottom: 10px;
-        }
-
-        .popup-logo {
-            height: 20px;
-            margin-bottom: 10px;
         }
 
         #map {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            z-index: 0;
+            width: 600px;
+            height: 600px;
+            margin: 0 auto;
+            margin-top: 30px;
         }
 
-        #info-card {
-            z-index: 1;
+        .mapster-map-loader {
             position: absolute;
-            top: 0;
-            left: 0;
-            padding: 30px;
-            background-color: rgba(255, 255, 255, 1);
-            box-shadow: rgba(255, 255, 255, 1) 0px 0px var(--blurriness) var(--blurriness);
-            border-radius: 5px;
-            margin: 40px;
+            width: 600px;
+            height: 600px;
+            text-align: center;
+            padding-top: 150px;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
         }
 
-        #popup {
-            z-index: 1;
-            position: absolute;
-            padding: 16px 20px;
-            background-color: rgba(255, 255, 255, 1);
-            box-shadow: 0px 0px 30px rgba(205, 185, 190, 0.4);
-            border-radius: 5px;
-            margin: 20px;
-            border-top: 10px solid var(--pinklist-pink);
+        .mapboxgl-popup-content {
+            padding: 8px;
         }
 
-        #map {
-            z-index: 0;
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 100%;
+        .pc_name {
+            font-size: 12px;
+            font-weight: bold;
+            padding-top: 0px;
+            margin-top: 0px;
+            margin-bottom: 5px;
         }
 
-        #search-bar {
-            font-size: 16px;
-            width: 300px;
-            padding: 20px 32px;
-            margin: 20px 0 20px -12px;
+        .mp_name,
+        .mp_party,
+        .link-text {
+            font-size: 11px;
+            margin: 0;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .pc_link {
+            color: rgb(73, 148, 175);
+            font-weight: bold;
+            text-decoration: none;
+            font-style: normal;
             border: none;
-            border-radius: 32px;
-            border: 1px solid var(--secondary-10);
-            color: var(--secondary-90);
-            box-shadow: 0px 0px 30px rgba(205, 185, 190, 0.4);
         }
 
-        .pinktext {
-            color: var(--pinklist-pink);
+        .pc_link:focus {
+            border: none;
+            outline: none;
         }
 
-        .flexrow {
+        .pink-legend {
+            width: 200px;
+            height: 50px;
+            z-index: 999;
+            position: absolute;
+            bottom: 0;
+            right: 0;
+        }
+
+        .legend-bar {
             display: flex;
-            gap: 20px;
-            margin-top: 20px;
+            width: 100%;
+            height: 18px;
         }
 
-        .flexcol {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            font-size: 11px;
+        .legend-bar p {
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            font-size: 10px;
+            color: white;
         }
 
-        .spacebetween {
-            justify-content: space-between;
+        .legend-bar .col2 p {
+            color: black;
         }
 
-        .icon {
-            height: 40px;
-            width: 40px;
-            border-radius: 40px;
-            border: 1px solid rgba(0, 0, 0, .1);
+        .legend-bar .col1 {
+            background: #ff33cc;
+            width: 50%;
         }
 
-        .card-party {
-            font-size: 11px;
-            font-size: 14px;
-            margin-top: -2px;
-            border-bottom: 1px solid var(--secondary-10);
-            padding-bottom: 8px;
-        }
-
-        .card-place {
-            font-size: 11px;
-            font-size: 14px;
-            margin-top: -8px;
-            padding-bottom: 8px;
-        }
-
-        .line-below {
-            border-bottom: 2px solid var(--secondary-10);
-            padding-bottom: 8px;
-        }
-
-        .text-11 {
-            font-size: 11px;
-        }
-
-        @media (max-width: 768px) {
-
-
-            .size36 {
-                width: 36px;
-                border-radius: 36px;
-                transform: rotate(360deg);
-            }
-
-            .rotate{
-                transition: .3s;
-                transform: rotate(180deg);
-            }
-
-            .size36:hover{
-                background-color: var(--secondary-10);
-            }
-
-            body {
-                font-size: 14px;
-            }
-
-            #info-card {
-                width: calc(100vw - 64px);
-                padding: 0 20px 12px 20px;
-                display: block;
-                margin: 0 20px 20px 20px;
-                border-radius: 0 0 8px 8px;
-            }
-
-            #popup {
-                top: auto !important;
-                bottom: 0 !important;
-                left: 0 !important;
-                right: 0 !important;
-                margin: 0;
-                border-radius: 8px 8px 0 0;
-            }
-
-            #search-bar {
-                width: 68vw;
-                display: flex;
-                margin: 16px -4px;
-                font-size: 14px;
-                padding: 16px 24px;
-            }
-
-            .flexrow {
-                gap: 20px;
-                align-items: center;
-            }
-
-            .flexcol {}
-
-            .icon {
-                height: 48px;
-                width: 48px;
-            }
-
-            .card-party,
-            .card-place {
-                font-size: 12px;
-            }
-
-            .text-11 {
-                display: none;
-            }
+        .legend-bar .col2 {
+            background: #fec8ea;
+            width: 50%;
         }
     </style>
 </head>
 
 <body>
-    <div id="popup"></div>
-    <div id="info-card">
-        <div class="flexrow spacebetween">
-            <img class="card-logo" src="logo.png" alt="">
-            <img id="header-status" class="size36" src="cross.svg" onclick="toggleHeaderMenu()" alt="">
+    <div id="map">
+        <div class="mapster-map-loader">
+            <svg width="38" height="38" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg" stroke="#333">
+                <g fill="none" fill-rule="evenodd">
+                    <g transform="translate(1 1)" stroke-width="2">
+                        <circle stroke-opacity=".5" cx="18" cy="18" r="18" />
+                        <path d="M36 18c0-9.94-8.06-18-18-18">
+                            <animateTransform attributeName="transform" type="rotate" from="0 18 18" to="360 18 18"
+                                dur="1s" repeatCount="indefinite" />
+                        </path>
+                    </g>
+                </g>
+            </svg>
         </div>
-
-        <div id="header-collapsible" class="fadeInDown">
-            <h2>Pink Sabha</h2>
-            <div>Know where your elected MP<br> stands on <span class="pinktext">LGBTQ+ Issues</span></div>
-            <input type="text" id="search-bar" placeholder="Search...">
-            <div>Filter by</div>
-            <div class="flexrow">
-                <div class="flexcol">
-                    <img class="icon" id="vocal-img" src="vocal.png" alt="">
-                    <div>Vocal</div>
+        <div class="pink-legend">
+            <div class="legend-bar">
+                <div class="col1">
+                    <p>Vocal</p>
                 </div>
-                <div class="flexcol">
-                    <img class="icon" id="silent-img" src="silent.png" alt="">
-                    <div>Silent</div>
+                <div class="col2">
+                    <p>Silent</p>
                 </div>
             </div>
         </div>
-        
     </div>
-
-    <div id="map"></div>
     <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoicGlua2xpc3RpbmRpYSIsImEiOiJja3lteW5oMm4za2ZyMm9wODg0dWkzcjR6In0.IXVrmHs0VdjfPTs2jv05gg';
 
-        function toggleHeaderMenu() {
+        let clickedState = null;
+        let hoveredStateId = null;
+        let fetchedData = false
 
-            var headerStatus = document.getElementById('header-status');
-
-            headerStatus.classList.toggle('rotate');
-            var infoCard = document.getElementById('header-collapsible');
-            if (infoCard.style.display === 'none') {
-                infoCard.style.display = 'block';
-                headerStatus.src = 'cross.svg';
-            } else {
-                infoCard.style.display = 'none';
-                headerStatus.src = 'menu.svg';
+        const map = new mapboxgl.Map({
+            container: 'map', // container ID
+            // Choose from Mapbox's core styles, or make your own style with Mapbox Studio
+            style: 'mapbox://styles/pinklistindia/clfihw7ai000401plmc5ci0k5', // style URL
+            bounds: [
+                [62.5170504413191, 37.79004143216858],
+                [97.69961600903463, 4.721941951550704]
+            ],
+            projection: {
+                name: 'mercator'
             }
-        }
+        });
 
-        mapboxgl.accessToken = 'pk.eyJ1IjoiZ3lhbmwiLCJhIjoiY2swNmNoY29kMDA2ZzNjbWN4MmRvbHlmYiJ9.HJHfadzLE1cNqce2G51BEQ';
+        const popup = new mapboxgl.Popup({ closeButton: false })
+        const clickPopup = new mapboxgl.Popup({ closeButton: false })
 
-        var infocard = document.getElementById('info-card');
-        var popup = document.getElementById('popup');
-        var searchbar = document.getElementById('search-bar');
-
-        fetch('./pl.json')
-            .then(response => response.json())
-            .then(data => {
-                function getEntryByPcId(pc_id) {
-                    const entry = data.find(entry => entry.pc_id === pc_id);
-                    if (entry) {
-                        return entry;
-                    } else {
-                        return null;
-                    }
+        map.addControl(
+            new MapboxGeocoder({
+                accessToken: mapboxgl.accessToken,
+                mapboxgl: mapboxgl,
+                countries: "IN",
+                flyTo: {
+                    maxZoom: 8
                 }
-
-                const map = new mapboxgl.Map({
-                    container: 'map',
-                    style: 'mapbox://styles/mapbox/streets-v9',
-                    projection: 'globe', // Display the map as a globe, since satellite-v9 defaults to Mercator
-                    zoom: 3.5,
-                    center: [80, 22]
-                });
-
-                map.on('load', function () {
-                    //Add a new source from our GeoJSON data and set the 'cluster' option to true.
-                    map.addSource('constit', {
-                        type: "geojson",
-                        data: "./2019.geojson"
-                    });
-                });
-
-
-                map.on('load', function () {
-                    map.addLayer({
-                        id: "constit",
-                        type: "fill",
-                        source: "constit",
-                        layout: {},
-                        paint: {
-                            "fill-color": "#E7D0E3",
-                            "fill-opacity": .8
-                        }
-                    });
-
-                    map.addLayer({
-                        id: "constit-borders",
-                        type: "line",
-                        source: "constit",
-                        layout: {},
-                        paint: {
-                            "line-color": "#FFF",
-                            "line-width": 1
-                        }
-                    });
-
-                    map.addLayer({
-                        id: "constit-labels",
-                        type: "symbol",
-                        source: "constit",
-                        layout: {
-                            "text-field": "{pc_name}",
-                            "text-font": ["Open Sans Bold", "Arial Unicode MS Bold"],
-                            "text-size": 12
-                        },
-                        paint: {
-                            "text-color": "#000"
-                        }
-                    });
-                });
-
-                map.on('click', 'constit', function (e) {
-
-                    var data = getEntryByPcId(e.features[0].properties.pc_id);
-
-                    var mouseX = e.originalEvent.clientX;
-                    var mouseY = e.originalEvent.clientY;
-
-                    popup.innerHTML = `<div>
-                            <h4>${data.Name}</h4>
-                            <p class="card-party">${data.Party}</p>
-                            <p class="card-place">${data.Constituency}, ${data.State}</p>
-                            <div class="flexrow text-11 line-below">
-
-                                <div class="flexcol">Overall
-                                    <img class="icon" id="vocal-img" src="vocal.png" alt="">
-                                    ${data["LGBTQIA+ Rights"]}
-                                </div>
-
-                                <div class="flexcol">Queer Rights
-                                    <img class="icon" id="vocal-img" src="vocal.png" alt="">
-                                    ${data["LGBTQIA+ Rights"]}
-                                </div>
-
-                                <div class="flexcol">Trans Rights
-                                    <img class="icon" id="vocal-img" src="vocal.png" alt="">
-                                    ${data["Trans Rights"]}
-                                </div>
-
-                                <div class="flexcol">Queerphobia
-                                    <img class="icon" id="vocal-img" src="vocal.png" alt="">
-                                    ${data["Homophobe"]}
-                                </div>
-
-                            </div>
-                            <div class="flexrow spacebetween"> 
-                            <img src="logo.png" class="popup-logo" alt="">
-                            Read More
-                            </div>
-                        </div>`;
-
-                    popup.style.left = mouseX + 'px';
-                    popup.style.top = mouseY + 'px';
-
-                    // new mapboxgl.Popup()
-                    //     .setLngLat(e.lngLat)
-                    //     .setHTML(`
-                    //         <p>${data.Name}</p>
-                    //         <p>${data.Party}</p>
-                    //         <p>${e.features[0].properties.pc_name}</p>
-                    //         <p>${data["Trans Rights"]}</p>
-                    //         <p>${data["LGBTQIA+ Rights"]}</p>
-                    //         <p>${data["Marriage Equality"]}</p>
-                    //     `)
-                    //     .addTo(map);
-                });
-
-
-                map.addControl(new mapboxgl.NavigationControl());
-                map.scrollZoom.disable();
-
-                map.on('style.load', () => {
-                    map.setFog({}); // Set the default atmosphere style
-                });
-
-
-                //end the fetch for the json data
             })
-            .catch(error => {
-                console.error('Error loading pl.json:', error);
+        );
+
+        map.on('load', () => {
+            fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vRI9K2oTcGJvJi542f8-CU3BIe_TN3ZMlGqEdmy1VBYn9KBo5dYFgMmEAK9D_QCQawmnahT9TZbC0ln/pub?output=csv').then(resp => resp.text()).then(response => {
+                csv().fromString(response).then(result => {
+                    console.log(result)
+                    fetchedData = result
+
+                    // Yes hex #ff33cc
+                    // No hex #fec8ea
+
+                    const yes_results = result.filter(row => row.QueerStatement === "1")
+                    const no_results = result.filter(row => row.QueerStatement === "0")
+                    const yes_ids = yes_results.map(row => parseInt(row.pc_id));
+                    const no_ids = no_results.map(row => parseInt(row.pc_id));
+
+                    console.log(yes_ids)
+
+                    const expression = [
+                        "case",
+                        ["in", ["get", "pc_id"], ["literal", yes_ids]], "#ff33cc",
+                        ["in", ["get", "pc_id"], ["literal", no_ids]], "#fec8ea",
+                        "#eee"
+                    ]
+
+                    map.setPaintProperty('india-pc-source-layer', 'fill-color', expression)
+                    map.setPaintProperty('india-pc-source-layer-line', 'line-width', [
+                        'case',
+                        ['boolean', ['feature-state', 'hover'], false],
+                        2,
+                        0.1
+                    ])
+
+                    document.getElementsByClassName('mapster-map-loader')[0].style.display = 'none';
+
+                })
+            })
+
+
+            map.on('mousemove', 'india-pc-source-layer', (e) => {
+                if (e.features.length > 0 && !clickedState) {
+                    if (hoveredStateId !== null) {
+                        map.setFeatureState(
+                            { source: 'composite', sourceLayer: "india_pc_source_layer", id: hoveredStateId },
+                            { hover: false }
+                        );
+                    }
+                    hoveredStateId = e.features[0].id;
+                    map.setFeatureState(
+                        { source: 'composite', sourceLayer: "india_pc_source_layer", id: hoveredStateId },
+                        { hover: true }
+                    );
+                    let properties = fetchedData.find(row => parseInt(row.pc_id) === e.features[0].properties.pc_id)
+                    popup.setLngLat(e.lngLat).setHTML(`
+					<div>
+						<p class="pc_name">${properties.Constituency}, ${properties.State}</p>
+						<p class="mp_name"><strong>${properties.Name}</strong></p>
+						<p class="mp_party">${properties.Party}</p>
+						<p class="link-text"><a class="pc_link" href="${properties.Link}" target="_blank">${properties.queer_text}</a></p>
+					</div>
+				`).addTo(map)
+                }
+            })
+
+            map.on('mouseleave', 'india-pc-source-layer', () => {
+                if (hoveredStateId !== null) {
+                    map.setFeatureState(
+                        { source: 'composite', sourceLayer: "india_pc_source_layer", id: hoveredStateId },
+                        { hover: false }
+                    );
+                }
+                hoveredStateId = null;
             });
+
+            clickPopup.on('close', () => {
+                setTimeout(() => {
+                    clickedState = null
+                }, 100)
+            })
+
+            map.on('click', 'india-pc-source-layer', (e) => {
+                if (e.features.length > 0 && !clickedState) {
+
+                    popup.remove()
+
+                    const bbox = turf.bbox(e.features[0])
+                    map.fitBounds(bbox, { padding: 150, maxZoom: 8 })
+
+                    let properties = fetchedData.find(row => parseInt(row.pc_id) === e.features[0].properties.pc_id)
+                    clickPopup.setLngLat(e.lngLat).setHTML(`
+					<div>
+						<p class="pc_name">${properties.Constituency}, ${properties.State}</p>
+						<p class="mp_name"><strong>${properties.Name}</strong></p>
+						<p class="mp_party">${properties.Party}</p>
+						<p class="link-text"><a class="pc_link" href="${properties.Link}" target="_blank">${properties.queer_text}</a></p>
+					</div>
+				`).addTo(map)
+
+
+                    clickedState = true;
+                }
+            })
+
+        })
 
     </script>
 
