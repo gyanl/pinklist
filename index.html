@@ -21,7 +21,10 @@
             --pinklist-pink: #F462BC;
             --secondary-10: #F2EDEF;
             --secondary-90: #8F626D;
+            --background: #1B1B1B;
         }
+
+
 
         h1,
         h2,
@@ -35,6 +38,7 @@
         }
 
         body {
+            background-color: var(--background);
             line-height: 1.4;
             margin: 0;
             padding: 0;
@@ -43,6 +47,37 @@
 
         .fadeInUp{
             animation: fadeInUp .3s;
+        }
+
+        @keyframes fadeInPulse {
+            0% {
+                opacity: 0;
+            }
+
+            20% {
+                opacity: .1;
+            }
+
+            40% {
+                opacity: 0;
+            }
+
+            60% {
+                opacity: .1;
+            }
+
+            80% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 1;
+            }
+            
+        }
+
+        .fadeInPulse{
+            animation: fadeInPulse 3s;
         }
 
         @keyframes fadeInUp {
@@ -366,7 +401,7 @@
     </div>
 
 
-    <div id="map">
+    <div id="map" class="fadeInPulse">
         <div class="mapster-map-loader">
             <svg width="38" height="38" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg" stroke="#333">
                 <g fill="none" fill-rule="evenodd">
