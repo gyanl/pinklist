@@ -14,6 +14,249 @@
         src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
     <script src="https://cdn.rawgit.com/Keyang/node-csvtojson/d41f44aa/browser/csvtojson.min.js"></script>
     <script src='https://unpkg.com/@turf/turf@6/turf.min.js'></script>
+    <link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --blurriness: 40px;
+            --pinklist-pink: #F462BC;
+            --secondary-10: #F2EDEF;
+            --secondary-90: #8F626D;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: Epilogue, sans-serif;
+            font-weight: 600;
+            margin: 4px 0;
+        }
+
+        body {
+            line-height: 1.4;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+        }
+
+        .fadeInUp{
+            animation: fadeInUp .3s;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fadeInDown{
+            animation: fadeInDown .3s;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-logo {
+            height: 32px;
+            margin-bottom: 10px;
+        }
+
+        .popup-logo {
+            height: 20px;
+            margin-bottom: 10px;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 0;
+        }
+
+        #info-card {
+            z-index: 1;
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: 30px;
+            background-color: rgba(255, 255, 255, 1);
+            box-shadow: rgba(255, 255, 255, 1) 0px 0px var(--blurriness) var(--blurriness);
+            border-radius: 5px;
+            margin: 40px;
+        }
+
+        #popup {
+            z-index: 1;
+            position: absolute;
+            padding: 16px 20px;
+            background-color: rgba(255, 255, 255, 1);
+            box-shadow: 0px 0px 30px rgba(205, 185, 190, 0.4);
+            border-radius: 5px;
+            margin: 20px;
+            border-top: 10px solid var(--pinklist-pink);
+        }
+
+        #map {
+            z-index: 0;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+
+        #search-bar {
+            font-size: 16px;
+            width: 300px;
+            padding: 20px 32px;
+            margin: 20px 0 20px -12px;
+            border: none;
+            border-radius: 32px;
+            border: 1px solid var(--secondary-10);
+            color: var(--secondary-90);
+            box-shadow: 0px 0px 30px rgba(205, 185, 190, 0.4);
+        }
+
+        .pinktext {
+            color: var(--pinklist-pink);
+        }
+
+        .flexrow {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .flexcol {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            font-size: 11px;
+        }
+
+        .spacebetween {
+            justify-content: space-between;
+        }
+
+        .icon {
+            height: 40px;
+            width: 40px;
+            border-radius: 40px;
+            border: 1px solid rgba(0, 0, 0, .1);
+        }
+
+        .card-party {
+            font-size: 11px;
+            font-size: 14px;
+            margin-top: -2px;
+            border-bottom: 1px solid var(--secondary-10);
+            padding-bottom: 8px;
+        }
+
+        .card-place {
+            font-size: 11px;
+            font-size: 14px;
+            margin-top: -8px;
+            padding-bottom: 8px;
+        }
+
+        .line-below {
+            border-bottom: 2px solid var(--secondary-10);
+            padding-bottom: 8px;
+        }
+
+        .text-11 {
+            font-size: 11px;
+        }
+
+        @media (max-width: 768px) {
+
+
+            .size36 {
+                width: 36px;
+                border-radius: 36px;
+                transform: rotate(360deg);
+            }
+
+            .rotate{
+                transition: .3s;
+                transform: rotate(180deg);
+            }
+
+            .size36:hover{
+                background-color: var(--secondary-10);
+            }
+
+            body {
+                font-size: 14px;
+            }
+
+            #info-card {
+                width: calc(100vw - 64px);
+                padding: 0 20px 12px 20px;
+                display: block;
+                margin: 0 20px 20px 20px;
+                border-radius: 0 0 8px 8px;
+            }
+
+            #popup {
+                top: auto !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                margin: 0;
+                border-radius: 8px 8px 0 0;
+            }
+
+            #search-bar {
+                width: 68vw;
+                display: flex;
+                margin: 16px -4px;
+                font-size: 14px;
+                padding: 16px 24px;
+            }
+
+            .flexrow {
+                gap: 20px;
+                align-items: center;
+            }
+
+            .flexcol {}
+
+            .icon {
+                height: 48px;
+                width: 48px;
+            }
+
+            .card-party,
+            .card-place {
+                font-size: 12px;
+            }
+
+            .text-11 {
+                display: none;
+            }
+        }
+    </style>
 
     <style>
         body {
@@ -21,25 +264,8 @@
             padding: 0;
         }
 
-        #map {
-            width: 600px;
-            height: 600px;
-            margin: 0 auto;
-            margin-top: 30px;
-        }
-
-        .mapster-map-loader {
-            position: absolute;
-            width: 600px;
-            height: 600px;
-            text-align: center;
-            padding-top: 150px;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 9999;
-        }
-
         .mapboxgl-popup-content {
-            padding: 8px;
+            padding: 12px 16px;
         }
 
         .pc_name {
@@ -112,6 +338,34 @@
 </head>
 
 <body>
+
+    <div id="popup"></div>
+    <div id="info-card">
+        <div class="flexrow spacebetween">
+            <img class="card-logo" src="logo.png" alt="">
+            <img id="header-status" class="size36" src="cross.svg" onclick="toggleHeaderMenu()" alt="">
+        </div>
+
+        <div id="header-collapsible" class="fadeInDown">
+            <h2>Pink Sabha</h2>
+            <div>Know where your elected MP<br> stands on <span class="pinktext">LGBTQ+ Issues</span></div>
+            <input type="text" id="search-bar" placeholder="Search...">
+            <div>Filter by</div>
+            <div class="flexrow">
+                <div class="flexcol">
+                    <img class="icon" id="vocal-img" src="vocal.png" alt="">
+                    <div>Vocal</div>
+                </div>
+                <div class="flexcol">
+                    <img class="icon" id="silent-img" src="silent.png" alt="">
+                    <div>Silent</div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+
     <div id="map">
         <div class="mapster-map-loader">
             <svg width="38" height="38" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg" stroke="#333">
@@ -224,10 +478,9 @@
                     let properties = fetchedData.find(row => parseInt(row.pc_id) === e.features[0].properties.pc_id)
                     popup.setLngLat(e.lngLat).setHTML(`
 					<div>
-						<p class="pc_name">${properties.Constituency}, ${properties.State}</p>
-						<p class="mp_name"><strong>${properties.Name}</strong></p>
-						<p class="mp_party">${properties.Party}</p>
-						<p class="link-text"><a class="pc_link" href="${properties.Link}" target="_blank">${properties.queer_text}</a></p>
+                        <h3>${properties.Name}</h3>
+                            <p class="card-party">${properties.Party}</p>
+                            <p class="card-place">${properties.Constituency}, ${properties.State}</p>
 					</div>
 				`).addTo(map)
                 }
@@ -259,12 +512,38 @@
 
                     let properties = fetchedData.find(row => parseInt(row.pc_id) === e.features[0].properties.pc_id)
                     clickPopup.setLngLat(e.lngLat).setHTML(`
-					<div>
-						<p class="pc_name">${properties.Constituency}, ${properties.State}</p>
-						<p class="mp_name"><strong>${properties.Name}</strong></p>
-						<p class="mp_party">${properties.Party}</p>
-						<p class="link-text"><a class="pc_link" href="${properties.Link}" target="_blank">${properties.queer_text}</a></p>
-					</div>
+                    <div>
+                            <h3>${properties.Name}</h3>
+                            <p class="card-party">${properties.Party}</p>
+                            <p class="card-place">${properties.Constituency}, ${properties.State}</p>
+                            <div class="flexrow text-11 line-below">
+
+                                <div class="flexcol">Overall
+                                    <img class="icon" id="vocal-img" src="vocal.png" alt="">
+                                    ${properties["LGBTQIA+ Rights"]}
+                                </div>
+
+                                <div class="flexcol">Queer Rights
+                                    <img class="icon" id="vocal-img" src="vocal.png" alt="">
+                                    ${properties["LGBTQIA+ Rights"]}
+                                </div>
+
+                                <div class="flexcol">Trans Rights
+                                    <img class="icon" id="vocal-img" src="vocal.png" alt="">
+                                    ${properties["Trans Rights"]}
+                                </div>
+
+                                <div class="flexcol">Queerphobia
+                                    <img class="icon" id="vocal-img" src="vocal.png" alt="">
+                                    ${properties["Homophobe"]}
+                                </div>
+
+                            </div>
+                            <div class="flexrow spacebetween"> 
+                            <img src="logo.png" class="popup-logo" alt="">
+                            <a href="${properties.Link}">Read More</a>
+                            </div>
+                        </div>
 				`).addTo(map)
 
 
